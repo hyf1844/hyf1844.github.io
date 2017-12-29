@@ -1,0 +1,978 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/myblog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/myblog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/myblog/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Oracle," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/myblog/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="本篇介绍：如何查看分析Oracle的执行计划">
+<meta name="keywords" content="Oracle">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Oracle执行计划说明">
+<meta property="og:url" content="https://hyf1844.github.io/2017/06/08/Oracle执行计划说明/index.html">
+<meta property="og:site_name" content="枫之落叶のblog">
+<meta property="og:description" content="本篇介绍：如何查看分析Oracle的执行计划">
+<meta property="og:image" content="http://wx4.sinaimg.cn/mw690/6d2ba8d3gy1fgdwa9gelmj20iz0e8t9o.jpg">
+<meta property="og:image" content="http://wx4.sinaimg.cn/mw690/6d2ba8d3gy1fgdwt16s9tj20qt0ayaai.jpg">
+<meta property="og:updated_time" content="2017-06-09T06:28:23.612Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Oracle执行计划说明">
+<meta name="twitter:description" content="本篇介绍：如何查看分析Oracle的执行计划">
+<meta name="twitter:image" content="http://wx4.sinaimg.cn/mw690/6d2ba8d3gy1fgdwa9gelmj20iz0e8t9o.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/myblog/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hyf1844.github.io/2017/06/08/Oracle执行计划说明/"/>
+
+
+
+
+
+  <title>Oracle执行计划说明 | 枫之落叶のblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?db26eec8dc6a4fb47ecea5256ff7eaaf";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/myblog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枫之落叶のblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/myblog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/myblog/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/myblog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/myblog/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://hyf1844.github.io/myblog/2017/06/08/Oracle执行计划说明/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="枫之落叶">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/myblog/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="枫之落叶のblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Oracle执行计划说明</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-08T16:38:03+08:00">
+                2017-06-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/myblog/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/myblog/2017/06/08/Oracle执行计划说明/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/08/Oracle执行计划说明/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/myblog/2017/06/08/Oracle执行计划说明/" class="leancloud_visitors" data-flag-title="Oracle执行计划说明">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇介绍：如何查看分析Oracle的执行计划</p>
+<a id="more"></a>
+<h2 id="1-查看执行计划"><a href="#1-查看执行计划" class="headerlink" title="1. 查看执行计划"></a>1. 查看执行计划</h2><h3 id="1-1-使用SQL命令查看"><a href="#1-1-使用SQL命令查看" class="headerlink" title="1.1 使用SQL命令查看"></a>1.1 使用SQL命令查看</h3><p>先使用explain plan for命令解析sql，再执行select * from TABLE(DBMS_XPLAN.DISPLAY);语句查看解析结果。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">SQL&gt; explain plan <span class="keyword">for</span> </div><div class="line">  2  select * from cust_order;</div><div class="line">Explained</div><div class="line"></div><div class="line">SQL&gt; select * from TABLE(DBMS_XPLAN.DISPLAY);</div><div class="line">PLAN_TABLE_OUTPUT</div><div class="line">--------------------------------------------------------------------------------</div><div class="line">Plan <span class="built_in">hash</span> value: 922872969</div><div class="line">-------------------------------------------------------------------------------</div><div class="line">| Id  | Operation         | Name       | Rows  | Bytes | Cost (%CPU)| Time     |</div><div class="line">-------------------------------------------------------------------------------</div><div class="line">|   0 | SELECT STATEMENT  |            | 78778 |    75M|  3279   (1)| 00:00:40 |</div><div class="line">|   1 |  TABLE ACCESS FULL| CUST_ORDER | 78778 |    75M|  3279   (1)| 00:00:40 |</div><div class="line">-------------------------------------------------------------------------------</div><div class="line">8 rows selected</div></pre></td></tr></table></figure></p>
+<h3 id="1-2-使用PLSQL或Toad等工具"><a href="#1-2-使用PLSQL或Toad等工具" class="headerlink" title="1.2 使用PLSQL或Toad等工具"></a>1.2 使用PLSQL或Toad等工具</h3><p>PLSQL下选择对应的sql按F5执行解析就可以了，需要显示更多的执行计划信息，可以在设置里面修改。<br><img src="http://wx4.sinaimg.cn/mw690/6d2ba8d3gy1fgdwa9gelmj20iz0e8t9o.jpg" alt=""></p>
+<h2 id="2-SQL执行顺序"><a href="#2-SQL执行顺序" class="headerlink" title="2. SQL执行顺序"></a>2. SQL执行顺序</h2><p>SQL的执行顺序按照下图执行计划从上到下，从右到左的顺序执行。从上到下，是指在同一层级下，上面的查询比下面的先执行，从右到左，是指层级右边的比左边的先执行，用户可以点击下一个操作的按钮逐步查看sql的执行顺序。<br><img src="http://wx4.sinaimg.cn/mw690/6d2ba8d3gy1fgdwt16s9tj20qt0ayaai.jpg" alt=""></p>
+<h2 id="3-COST-耗费"><a href="#3-COST-耗费" class="headerlink" title="3. COST(耗费)"></a>3. COST(耗费)</h2><blockquote>
+<p>The Oracle Optimizer is a cost-based optimizer. The execution plan selected for a SQL statement is just one of the many alternative execution plans considered by the Optimizer. The Optimizer selects the execution plan with the lowest cost, where cost represents the estimated resource usage for that plan. The lower the cost the more efficient the plan is expected to be. The optimizer’s cost model accounts for the IO, CPU, and network resources that will be used by the query. </p>
+</blockquote>
+<p>上面的图中有COST这一列，Oracle现在主要使用的是基于代价的优化器，Oracle会自动选择COST最小的执行计划，COST并没有单位，是一个相对值，Oracle会根据COST的大小来评估CBO的执行成本，选择执行计划。COST的计算由磁盘IO、CPU、网络资源计算而成。</p>
+<h2 id="4-Cardinality-基数"><a href="#4-Cardinality-基数" class="headerlink" title="4. Cardinality(基数)"></a>4. Cardinality(基数)</h2><blockquote>
+<p>The cardinality is the estimated number of rows that will be returned by each operation. The Optimizer determines the cardinality for each operation based on a complex set of formulas that use both table and column level statistics as input (or the statistics derived by dynamic sampling). One of the simplest formulas is used when there is a single equality predicate in a single table query (with no histogram). In this case the Optimizer assumes a uniform distribution and calculates the cardinality for the query by dividing the total number of rows in the table by the number of distinct values in the column used in the where clause predicate. </p>
+</blockquote>
+<p>Cardinality是Oracle执行sql每一步操作估算的记录行数，CBO优化器会根据查询的表、列级别的统计数据或者动态的数据采样统计作为输入数据，经过一系统复杂的计算得出Cardinality。</p>
+<h2 id="5-Access-Method"><a href="#5-Access-Method" class="headerlink" title="5. Access Method"></a>5. Access Method</h2><ul>
+<li>Full table scan-全表扫描，它会访问表中的所有记录，大数据量的表查询应该尽量避免这种操作。</li>
+<li>Table access by ROWID-通过ROWID访问表记录。记录的ROWID指向了该行的数据文件，数据块以及数据块中的位置。这是查找行记录最快的方式，Oracle会优先使用这种方式。</li>
+<li>Index unique scan-通过唯一索引扫描只会返回一条记录，Oracle通常会使用唯一索引或者主键去进去查找。</li>
+<li>Index range scan-索引范围扫描，发生在对唯一索引进行范围操作的情况下，如(=, &lt;, &gt;,LIKE等)。</li>
+<li>Index range scan descending-带排序的索引范围扫描，访问跟Index range scan一样，当索引满足ORDER BY .. DESCENDING这种排序语句的时候使用。</li>
+<li>Index skip scan-组合索引键中非前导列索引检索。适用于查询条件中没有指定组合索引的前导列，只是指定了组合索引的其它列，这样Oracle就会使用Index skip scan的方式来访问数据。在前导列的数据唯一值越少，非前导列的数据唯一值越多的情况下，Index skip scan的性能越好。<br>实际的搜索过程中，Oracle是会根据前导列的唯一值的个数划分多个查询入口，利用组合索引的其它列在各自的前导查询入口里面搜索数据，再合并结果集。例如有一个表user_info(user_id, sex, user_name)，其中(sex, user_name)是组合索引，当查询条件为user_name=’ZhangSan’时，而sex这一列的唯一值只有0，1两种情况时，实际的查询应该是类似于<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> * <span class="keyword">from</span> user_info <span class="keyword">where</span> sex = <span class="number">0</span> <span class="keyword">and</span> user_name=<span class="string">'ZhangSan'</span> </div><div class="line"><span class="keyword">union</span> all </div><div class="line"><span class="keyword">select</span> * <span class="keyword">from</span> user_info <span class="keyword">where</span> sex = <span class="number">1</span> <span class="keyword">and</span> user_name=<span class="string">'ZhangSan'</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>因此可以看出，当索引前导列的唯一值过多，Index skip scan的性能应付受到影响。而Index skip scan的使用条件包括以下三个：<br>（1）索引是一个复合索引，可以是唯一索引，也可以不唯一<br>（2）索引中前导列的重复值很多，即唯一值少，其它列重复值很少，即唯一值很多<br>（3）查询条件中没有使用前导列条件来过滤数据</p>
+<ul>
+<li>Full Index scan-索引全扫描，就是指要扫描目标索引所有叶子块的所有索引行，但是并不需要扫描该索引的所有的分支块，在默认情况下，Oracle在做索引全扫描时只需要通过访问必要的分支块定位到位于该索引最左边的叶子块的第一行索引行，就可以利用该索引叶子块之间的双向指针链表，从左至右依次顺序扫描该索引所有叶子块的所有索引行了。Full Index scan在查询的条件列都有索引的情况下使用，它会比搜索Table更加高效。</li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://docs.oracle.com/cd/B19306_01/server.102/b14211/ex_plan.htm#i25909" target="_blank" rel="external">https://docs.oracle.com/cd/B19306_01/server.102/b14211/ex_plan.htm#i25909</a><br><a href="http://blog.csdn.net/truelove12358/article/details/70282445" target="_blank" rel="external">http://blog.csdn.net/truelove12358/article/details/70282445</a><br><a href="http://blog.csdn.net/tianlesoftware/article/details/5826546" target="_blank" rel="external">http://blog.csdn.net/tianlesoftware/article/details/5826546</a><br><a href="http://www.iteye.com/topic/586256" target="_blank" rel="external">http://www.iteye.com/topic/586256</a></p>
+<h2 id="更新日志"><a href="#更新日志" class="headerlink" title="更新日志"></a>更新日志</h2>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/myblog/tags/Oracle/" rel="tag"># Oracle</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/myblog/2017/05/31/IntelliJ IDEA常用设置和插件/" rel="next" title="IntelliJ IDEA常用设置和插件">
+                <i class="fa fa-chevron-left"></i> IntelliJ IDEA常用设置和插件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/myblog/2017/06/13/SpringCloud学习笔记1——eureka服务注册与发现/" rel="prev" title="SpringCloud学习笔记1——eureka服务注册与发现">
+                SpringCloud学习笔记1——eureka服务注册与发现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/myblog/images/avatar.jpg"
+               alt="枫之落叶" />
+          <p class="site-author-name" itemprop="name">枫之落叶</p>
+           
+              <p class="site-description motion-element" itemprop="description">雄关漫道真如铁，而今迈步从头越</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/myblog/archives">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/myblog/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/myblog/tags/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/hyf1844" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/hyf1844/home" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/10815991/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-查看执行计划"><span class="nav-text">1. 查看执行计划</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-使用SQL命令查看"><span class="nav-text">1.1 使用SQL命令查看</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-使用PLSQL或Toad等工具"><span class="nav-text">1.2 使用PLSQL或Toad等工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SQL执行顺序"><span class="nav-text">2. SQL执行顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-COST-耗费"><span class="nav-text">3. COST(耗费)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Cardinality-基数"><span class="nav-text">4. Cardinality(基数)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Access-Method"><span class="nav-text">5. Access Method</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新日志"><span class="nav-text">更新日志</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">枫之落叶</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/myblog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/myblog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/myblog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/myblog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/myblog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/myblog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/myblog/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/myblog/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/myblog/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/myblog/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/myblog/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/myblog/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/myblog/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/myblog/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://hyf1844.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://hyf1844.github.io/2017/06/08/Oracle执行计划说明/';
+          this.page.identifier = '2017/06/08/Oracle执行计划说明/';
+          this.page.title = 'Oracle执行计划说明';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://hyf1844.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("FYHfnbKzxH51ahIorQYMYUUa-gzGzoHsz", "9TSHWd3Rdiog6cRNTzGmBgdw");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
