@@ -78,8 +78,8 @@
       </categories>
       <tags>
         <tag>SpringCloud</tag>
-        <tag>SpringBoot</tag>
         <tag>hystrix</tag>
+        <tag>SpringBoot</tag>
       </tags>
   </entry>
   <entry>
@@ -91,8 +91,8 @@
       </categories>
       <tags>
         <tag>SpringCloud</tag>
-        <tag>eureka</tag>
         <tag>SpringBoot</tag>
+        <tag>eureka</tag>
       </tags>
   </entry>
   <entry>
