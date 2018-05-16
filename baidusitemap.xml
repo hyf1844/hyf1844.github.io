@@ -4,6 +4,46 @@
 
     
   <url>
+    <loc>http://hyfblog.com/2018/05/07/SpringStatemachine%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BD%BF%E7%94%A8Papyrus%E6%9E%84%E5%BB%BA%E7%AE%80%E5%8D%95%E7%9A%84%E7%8A%B6%E6%80%81%E6%9C%BA/</loc>
+    <lastmod>2018-05-16T14:25:04.780Z</lastmod>
+    <data>
+        <display>
+        <title>SpringStatemachine学习笔记2——使用Papyrus构建简单的状态机</title>
+        <pubTime>2018-05-07T12:55:08.000Z</pubTime>
+        
+        <tag>Spring Statemachine</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java开发" url="http://hyfblog.com/categories/Java%E5%BC%80%E5%8F%91/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://hyfblog.com/2018/03/15/SpringStatemachine%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E7%8A%B6%E6%80%81%E6%9C%BA/</loc>
+    <lastmod>2018-05-07T12:44:18.176Z</lastmod>
+    <data>
+        <display>
+        <title>SpringStatemachine学习笔记1——搭建一个简单的状态机</title>
+        <pubTime>2018-03-15T14:01:34.000Z</pubTime>
+        
+        <tag>Spring Statemachine</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java开发" url="http://hyfblog.com/categories/Java%E5%BC%80%E5%8F%91/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://hyfblog.com/2018/02/11/Jenkins%E5%AE%9E%E7%8E%B0WebLogic%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/</loc>
     <lastmod>2018-02-11T06:33:57.298Z</lastmod>
     <data>
@@ -97,9 +137,9 @@
         
         <tag>SpringCloud</tag>
          
-        <tag>hystrix</tag>
-         
         <tag>SpringBoot</tag>
+         
+        <tag>hystrix</tag>
          
          
            
@@ -143,9 +183,9 @@
         
         <tag>SpringCloud</tag>
          
-        <tag>SpringBoot</tag>
-         
         <tag>eureka</tag>
+         
+        <tag>SpringBoot</tag>
          
          
            
